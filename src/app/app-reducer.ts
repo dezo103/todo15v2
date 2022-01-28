@@ -23,3 +23,5 @@ export const setAppStatusAC = (status: RequestStatusType) => {
         status
     } as const
 }
+
+export type SetAppStatusActionType = ReturnType<typeof setAppStatusAC>
