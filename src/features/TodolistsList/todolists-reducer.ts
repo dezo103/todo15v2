@@ -61,6 +61,13 @@ export const fetchTodolistsTC = () => {
             })
     }
 }
+
+enum ResponseStatusCodes {
+    success = 0,
+    error = 1,
+    captcha = 10
+}
+
 export const removeTodolistTC = (todolistId: string) => {
     return (dispatch: Dispatch<ActionsType>) => {
         dispatch(setAppStatusAC('loading'))
@@ -68,7 +75,7 @@ export const removeTodolistTC = (todolistId: string) => {
         todolistsAPI.deleteTodolist(todolistId)
             .then((res) => {
                 dispatch(setAppStatusAC('succeeded'))
-                if (res.data.resultCode === 0) {
+                if (res.data.resultCode === ResponseStatusCodes.success) {
                     dispatch(removeTodolistAC(todolistId))
                 } else {
                     if (res.data.messages.length) {
@@ -87,9 +94,11 @@ export const addTodolistTC = (title: string) => {
         dispatch(setAppStatusAC('loading'))
         todolistsAPI.createTodolist(title)
             .then((res) => {
-                if (res.data.resultCode === 0) {
+                dispatch(setAppStatusAC('succeeded'))
+                if (res.data.resultCode === ResponseStatusCodes.success) {
                     dispatch(addTodolistAC(res.data.data.item))
                 } else {
+                    dispatch(setAppStatusAC('failed'))
                     if (res.data.messages.length) {
                         dispatch(setAppErrorAC(res.data.messages[0]))
                     }
@@ -100,9 +109,7 @@ export const addTodolistTC = (title: string) => {
             })
             .catch((err: AxiosError)=>{
                 dispatch(setAppErrorAC(err.message))
-            })
-            .finally(()=>{
-                dispatch(setAppStatusAC("idle"))
+                dispatch(setAppStatusAC('failed'))
             })
     }
 }
