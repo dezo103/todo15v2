@@ -87,7 +87,6 @@ export const addTodolistTC = (title: string) => {
         dispatch(setAppStatusAC('loading'))
         todolistsAPI.createTodolist(title)
             .then((res) => {
-                dispatch(setAppStatusAC('succeeded'))
                 if (res.data.resultCode === 0) {
                     dispatch(addTodolistAC(res.data.data.item))
                 } else {
@@ -96,12 +95,14 @@ export const addTodolistTC = (title: string) => {
                     }
                     else {
                         dispatch(setAppErrorAC('Some error occurred'))
-
                     }
                 }
             })
             .catch((err: AxiosError)=>{
-                debugger
+                dispatch(setAppErrorAC(err.message))
+            })
+            .finally(()=>{
+                dispatch(setAppStatusAC("idle"))
             })
     }
 }
